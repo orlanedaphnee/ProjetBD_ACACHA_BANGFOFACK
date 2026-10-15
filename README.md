@@ -75,45 +75,49 @@ Fournis donc les règles de gestion et le dictionnaire de données.
 - Un profil peut regarder plusieurs fois le même film ou le même épisode, à des moments différents.
 - Le nombre d'écrans qui regardent en même temps ne doit pas dépasser la limite de la formule du compte.
 
+> **Note :** les règles sur les saisons et les épisodes (section C, deux dernières puces) et la mention « ou un épisode » de la règle E ne sont pas modélisées dans le MCD (voir sections 6 et 7).
+
 ## 5. Dictionnaire de données (obtenu auprès de l'IA)
 
-| N° | Signification de la donnée | Type | Taille |
-|---:|---|---|---|
-| 1 | Identifiant de la formule d'abonnement | Entier | 5 chiffres |
-| 2 | Nom de la formule d'abonnement | Texte | 30 caractères |
-| 3 | Prix mensuel de la formule | Décimal | 5 chiffres dont 2 décimales |
-| 4 | Nombre maximal d'écrans simultanés | Entier | 1 chiffre |
-| 5 | Qualité vidéo maximale | Texte | 10 caractères |
-| 6 | Identifiant du compte client | Entier | 10 chiffres |
-| 7 | Adresse e-mail du compte | Texte | 254 caractères |
-| 8 | Mot de passe du compte | Texte | 255 caractères |
-| 9 | Date de création du compte | Date | 10 caractères |
-| 10 | Date de début de l'abonnement | Date | 10 caractères |
-| 11 | Date de fin de l'abonnement | Date | 10 caractères |
-| 12 | État de l'abonnement (actif, suspendu, résilié) | Texte | 15 caractères |
-| 13 | Identifiant du profil | Entier | 10 chiffres |
-| 14 | Nom du profil | Texte | 30 caractères |
-| 15 | Type de profil (standard ou jeunesse) | Texte | 10 caractères |
-| 16 | Langue préférée du profil | Texte | 5 caractères |
-| 17 | Catégorie d'âge maximale du profil | Texte | 5 caractères |
-| 18 | Identifiant du contenu | Entier | 10 chiffres |
-| 19 | Type de contenu (film ou série) | Texte | 5 caractères |
-| 20 | Titre du contenu | Texte | 150 caractères |
-| 21 | Description du contenu | Texte | 1000 caractères |
-| 22 | Date de sortie du contenu | Date | 10 caractères |
-| 23 | Durée du film en minutes | Entier | 3 chiffres |
-| 24 | Nom du genre | Texte | 40 caractères |
-| 25 | Numéro de la saison | Entier | 2 chiffres |
-| 26 | Numéro de l'épisode dans la saison | Entier | 3 chiffres |
-| 27 | Titre de l'épisode | Texte | 150 caractères |
-| 28 | Durée de l'épisode en minutes | Entier | 3 chiffres |
-| 29 | Identifiant de l'acteur | Entier | 10 chiffres |
-| 30 | Nom complet de l'acteur | Texte | 100 caractères |
-| 31 | Identifiant du personnage | Entier | 10 chiffres |
-| 32 | Nom du personnage | Texte | 100 caractères |
-| 33 | Date et heure de début du visionnage | Date/heure | 19 caractères |
-| 34 | Durée regardée en minutes | Entier | 4 chiffres |
-| 35 | Type d'appareil utilisé | Texte | 20 caractères |
+La dernière colonne indique si la donnée est retenue dans le MCD (voir section 6).
+
+| N° | Signification de la donnée | Type | Taille | Dans le MCD |
+|---:|---|---|---|---|
+| 1 | Identifiant de la formule d'abonnement | Entier | 5 chiffres | Oui |
+| 2 | Nom de la formule d'abonnement | Texte | 30 caractères | Oui |
+| 3 | Prix mensuel de la formule | Décimal | 5 chiffres dont 2 décimales | Oui |
+| 4 | Nombre maximal d'écrans simultanés | Entier | 1 chiffre | Oui |
+| 5 | Qualité vidéo maximale | Texte | 10 caractères | Oui |
+| 6 | Identifiant du compte client | Entier | 10 chiffres | Oui |
+| 7 | Adresse e-mail du compte | Texte | 254 caractères | Oui |
+| 8 | Mot de passe du compte | Texte | 255 caractères | Oui |
+| 9 | Date de création du compte | Date | 10 caractères | Oui |
+| 10 | Date de début de l'abonnement | Date | 10 caractères | Oui |
+| 11 | Date de fin de l'abonnement | Date | 10 caractères | Oui |
+| 12 | État de l'abonnement (actif, suspendu, résilié) | Texte | 15 caractères | Oui |
+| 13 | Identifiant du profil | Entier | 10 chiffres | Oui |
+| 14 | Nom du profil | Texte | 30 caractères | Oui |
+| 15 | Type de profil (standard ou jeunesse) | Texte | 10 caractères | Oui |
+| 16 | Langue préférée du profil | Texte | 5 caractères | Oui |
+| 17 | Catégorie d'âge maximale du profil | Texte | 5 caractères | Oui |
+| 18 | Identifiant du contenu | Entier | 10 chiffres | Oui |
+| 19 | Type de contenu (film ou série) | Texte | 5 caractères | Oui |
+| 20 | Titre du contenu | Texte | 150 caractères | Oui |
+| 21 | Description du contenu | Texte | 1000 caractères | Oui |
+| 22 | Date de sortie du contenu | Date | 10 caractères | Oui |
+| 23 | Durée du film en minutes | Entier | 3 chiffres | Oui |
+| 24 | Nom du genre | Texte | 40 caractères | Oui |
+| 25 | Numéro de la saison | Entier | 2 chiffres | Non |
+| 26 | Numéro de l'épisode dans la saison | Entier | 3 chiffres | Non |
+| 27 | Titre de l'épisode | Texte | 150 caractères | Non |
+| 28 | Durée de l'épisode en minutes | Entier | 3 chiffres | Non |
+| 29 | Identifiant de l'acteur | Entier | 10 chiffres | Oui |
+| 30 | Nom complet de l'acteur | Texte | 100 caractères | Oui |
+| 31 | Identifiant du personnage | Entier | 10 chiffres | Oui |
+| 32 | Nom du personnage | Texte | 100 caractères | Oui |
+| 33 | Date et heure de début du visionnage | Date/heure | 19 caractères | Oui |
+| 34 | Durée regardée en minutes | Entier | 4 chiffres | Oui |
+| 35 | Type d'appareil utilisé | Texte | 20 caractères | Oui |
 
 ## 6. Vérification et problèmes rencontrés
 
@@ -131,11 +135,66 @@ Fournis donc les règles de gestion et le dictionnaire de données.
 **Corrections apportées pour l'essai 2 :**
 - Prompt modifié (version 2) : la liste des données collectées mentionne désormais les genres et sous-genres, les personnages incarnés et les visionnages, et ne parle plus de recommandations.
 - Le prompt a été re-soumis en entier.
-- Aucune donnée n'a été retirée du dictionnaire.
+
+**Simplification décidée lors de la modélisation :**
+- Un épisode étant lui-même un contenu regardable, une entité ÉPISODE à côté de CONTENU créait une ambiguïté (le visionnage devait pointer soit vers un contenu, soit vers un épisode).
+- Nous avons donc retiré la notion de saison et d'épisode du MCD. Les données n° 25 à 28 (numéro de saison, numéro d'épisode, titre de l'épisode, durée de l'épisode) ne sont pas retenues.
+- Le MCD contient 31 des 35 données du dictionnaire. Les règles correspondantes (section 4, partie C, deux dernières puces, et mention « ou un épisode » de la règle E) ne sont pas modélisées.
+- Un contenu de type « série » est donc représenté comme un seul contenu, sans détail des saisons ni des épisodes.
 
 ## 7. MCD
 
-*À compléter : image du MCD et lien vers le fichier source.*
+Le MCD a été réalisé avec **Looping**. Fichier source : [`mcd/netflix.loo`](mcd/netflix.loo)
+
+![MCD](mcd/netflix.png)
+
+### Éléments de modélisation avancée
+
+| Élément | Où | Justification |
+|---|---|---|
+| Association récursive | GENRE (association SOUS_GENRE) | Un genre peut avoir des sous-genres (Comédie, puis Comédie romantique) |
+| Entité faible / forte | VISIONNAGE dépend de PROFIL | Un visionnage n'existe pas sans le profil qui l'a effectué, il est identifié par sa date et heure de début relativement au profil |
+| Association ternaire | INCARNER (ACTEUR, CONTENU, PERSONNAGE) | Un personnage peut être joué par des acteurs différents selon le contenu |
+
+### Entités
+
+| Entité | Identifiant | Autres attributs |
+|---|---|---|
+| FORMULE | id_formule | nom_formule, prix_mensuel, nb_ecrans_max, qualite_max |
+| COMPTE | id_compte | email, mot_de_passe, date_creation |
+| PROFIL | id_profil | nom_profil, type_profil, langue_preferee, categorie_age_max |
+| CONTENU | id_contenu | type_contenu, titre, description, date_sortie, duree_film |
+| GENRE | nom_genre | |
+| ACTEUR | id_acteur | nom_acteur |
+| PERSONNAGE | id_personnage | nom_personnage |
+| VISIONNAGE (faible) | date_heure_debut, relatif à PROFIL | duree_regardee, type_appareil |
+
+### Associations et cardinalités
+
+| Association | Patte 1 | Patte 2 | Attributs |
+|---|---|---|---|
+| POSSEDER | PROFIL (1,1) | COMPTE (1,N) | |
+| SOUSCRIRE | COMPTE (0,N) | FORMULE (0,N) | date_debut, date_fin, etat |
+| CLASSER | CONTENU (1,N) | GENRE (0,N) | |
+| SOUS_GENRE (récursive) | GENRE, rôle sous-genre (0,1) | GENRE, rôle genre parent (0,N) | |
+| INCARNER (ternaire) | ACTEUR (0,N) | CONTENU (0,N) et PERSONNAGE (0,N) | |
+| EFFECTUER | VISIONNAGE (1,1), identifiant relatif | PROFIL (0,N) | |
+| VISIONNER | VISIONNAGE (1,1) | CONTENU (0,N) | |
+
+### Choix de modélisation
+
+- L'historique des abonnements est porté par l'association SOUSCRIRE (date_debut, date_fin, etat).
+- Le visionnage est enregistré au niveau du contenu (film ou série).
+- Les saisons et épisodes ne sont pas modélisés (voir section 6).
+- Les 31 données retenues du dictionnaire sont toutes présentes dans le MCD (les données 10, 11 et 12 sont sur l'association SOUSCRIRE).
+
+### Contraintes non représentables dans le MCD
+
+- Un compte contient au maximum 5 profils.
+- À un instant donné, un compte a une seule formule active.
+- Le nom d'un profil est unique au sein d'un même compte.
+- L'adresse e-mail d'un compte est unique.
+- Le nombre d'écrans qui regardent en même temps ne dépasse pas la limite de la formule du compte.
 
 ## 8. Organisation du dépôt
 
@@ -143,5 +202,6 @@ Fournis donc les règles de gestion et le dictionnaire de données.
 .
 ├── README.md    Documentation du projet
 ├── prompt.md    Prompt final utilisé
-└── mcd/         Fichier source du MCD (à venir)
+└── mcd/
+    └── netflix.png    Image du MCD
 ```

@@ -204,4 +204,220 @@ Le MCD a été réalisé avec **Looping**. Fichier source : [`mcd/netflix.loo`](
 ├── prompt.md    Prompt final utilisé
 └── mcd/
     └── netflix.png    Image du MCD
+    └──fichier source MCD
 ```
+
+
+## 9. Étape 3 — MLD et MPD
+
+### MLD
+
+Déduit du MCD avec les règles de transformation (Looping). Clés primaires **en gras**, clés étrangères précédées de `#`.
+
+- Formule = (**id_formule**, nom_formule, prix_mensuel, nb_ecran_max, qualite_max)
+- Compte = (**id_compte**, email, mot_de_passe, date_creation)
+- Souscrire = (**#id_compte**, **#id_formule**, **date_debut**, date_fin, etat)
+- Profil = (**id_profil**, nom_profil, type_profil, langue_preferee, categorie_age_max, #id_compte)
+- Contenu = (**id_contenu**, type_contenu, titre, description, date_sortie, duree_film)
+- Genre = (**nom_genre**, #nom_genre_parent)
+- Classer = (**#id_contenu**, **#nom_genre**)
+- Acteur = (**id_acteur**, nom_acteur)
+- Personnage = (**id_personnage**, nom_personnage)
+- Incarner = (**#id_contenu**, **#id_acteur**, **#id_personnage**)
+- Visionnage = (**#id_profil**, **date_heure_debut**, duree_regardee, type_appareil, #id_contenu)
+
+**Règles de transformation appliquées :**
+- **Associations (1,1) — (x,n), comme POSSEDER et VISIONNER :** la clé de l'entité côté n migre comme clé étrangère, ce qui donne `#id_compte` dans Profil et `#id_contenu` dans Visionnage.
+- **Associations (x,n) — (x,n), comme SOUSCRIRE, CLASSER et INCARNER (ternaire) :** elles deviennent une table, dont la clé primaire est composée des clés des entités liées.
+- **Association récursive SOUS_GENRE (0,1) :** elle donne la clé étrangère `#nom_genre_parent` dans Genre, qui fait référence à `nom_genre`.
+- **Entité faible VISIONNAGE, identifiée relativement à PROFIL :** sa clé primaire est `(id_profil, date_heure_debut)`.
+- **Choix pour Souscrire :** on a ajouté `date_debut` à la clé primaire. Un compte peut ainsi reprendre plus tard une formule qu'il avait déjà eue, et l'historique des abonnements est conservé (règle A).
+
+### MPD
+
+- `1_creation.sql` : création des tables, clés primaires et clés étrangères. Toutes les clés étrangères ont `ON DELETE CASCADE ON UPDATE CASCADE`, sauf le genre parent, qui a `ON DELETE SET NULL`.
+- `2_contraintes.sql` : contraintes de validation tirées des règles de gestion :
+  - valeurs non vides ;
+  - valeurs autorisées avec `IN` et intervalles avec `BETWEEN` ;
+  - format de l'e-mail avec `LIKE` ;
+  - unicité du nom de profil dans un compte ;
+  - cohérence entre l'état et la date de fin, entre un film et sa durée, entre un profil jeunesse et sa catégorie d'âge.
+- Les règles « 5 profils maximum par compte » et « une seule formule active à la fois » ne peuvent pas s'écrire avec un `CHECK`, parce qu'il faudrait compter des lignes. Elles restent des contraintes non représentables (voir section 7).
+
+## 10. Étape 4 — Insertion des données
+
+Les données ont été générées automatiquement avec une IA générative (**Claude**, Anthropic), à partir d'un prompt construit sur le modèle de celui du TP1.
+
+**Ce qu'on a gardé du prompt du TP1 :**
+- le modèle relationnel complet, avec les clés primaires indiquées après chaque relation et les clés étrangères repérées par `#` ;
+- le nombre de lignes attendu pour chaque table ;
+- l'ordre de remplissage : d'abord les tables sans clé étrangère, ensuite les tables dont les clés étrangères pointent vers des tables déjà remplies ;
+- la liste des contraintes de validation, copiée telle quelle en SQL ;
+- la demande de noms variés et mixtes, et un script SQL prêt à être exécuté.
+
+**Ce qu'on a adapté à notre BD :**
+- les maisons du TP1 sont remplacées par les 3 formules citées dans nos règles de gestion (Standard avec publicité, Standard, Premium), dont les caractéristiques sont imposées ;
+- on reprend le vocabulaire de nos règles de gestion et du dictionnaire de données : profils `standard` ou `jeunesse`, catégories d'âge de `7+` à `18+`, état de l'abonnement (`actif`, `suspendu`, `résilié`) et types d'appareil ;
+- on a ajouté des règles de cohérence que les `CHECK` ne peuvent pas exprimer :
+  - un visionnage a lieu après la création du compte et après la sortie du contenu ;
+  - la durée regardée ne dépasse pas la durée du film ;
+  - les profils jeunesse ne regardent que de l'Animation ou du contenu Famille ;
+  - un compte a au plus une souscription active ou suspendue à la fois ;
+  - un même personnage apparaît dans plusieurs contenus avec des acteurs différents ;
+- on demande volontairement quelques cas « vides » (contenus jamais vus, profils inactifs, comptes qui ont tout résilié) pour que les jointures externes et les `NOT EXISTS` de l'étape 5 renvoient des résultats ;
+- les genres principaux sont insérés avant les sous-genres, à cause de l'auto-référence `nom_genre_parent`.
+
+Le prompt est dans [`prompt_insertion.txt`](prompt_insertion.txt) et le résultat dans [`3_insertion.sql`](3_insertion.sql).
+
+| Table | Lignes |
+|---|---|
+| Formule | 3 |
+| Compte | 30 |
+| Souscrire | 41 (23 actives, 3 suspendues, 15 résiliées) |
+| Profil | 90 (dont 23 jeunesse) |
+| Contenu | 40 (28 films, 12 séries) |
+| Genre | 16 (8 principaux + 8 sous-genres) |
+| Classer | 84 |
+| Acteur | 40 |
+| Personnage | 60 |
+| Incarner | 104 |
+| Visionnage | 320 |
+
+---
+
+## 11. Étape 5 — Interrogation de la BD
+
+### Scénario d'utilisation
+
+**Utilisateur :** le ou la **responsable Stratégie contenus & Marketing** de la plateforme.
+
+**Contexte :** l'équipe prépare la **campagne de fin d'année**. La personne interroge la base pour :
+
+1. **Choisir les contenus à mettre en avant :** les nouveautés (films sortis depuis 2022), les contenus les plus regardés, le casting des séries pour les visuels, les contenus « multi-écrans » vus sur téléviseur et sur smartphone.
+2. **Cibler les supports et les langues :** les appareils les plus utilisés et les langues préférées des profils, pour savoir où diffuser la campagne et dans quelles langues la traduire.
+3. **Relancer les abonnés perdus :** les comptes qui ont tout résilié, pour une campagne « Revenez chez nous », les souscriptions suspendues à surveiller, et les profils qui n'ont encore rien regardé.
+4. **Faire monter en gamme :** les comptes familles (4 profils ou plus) et les comptes en formule Standard ou Standard avec publicité qui regardent plus que certains comptes Premium, pour leur proposer le passage en Premium. Elle suit aussi le revenu mensuel par formule.
+5. **Valoriser le catalogue :** les contenus Animation réellement regardés par les profils jeunesse, et les contenus jamais visionnés, à remettre en avant ou à retirer.
+
+Chaque requête de [`4_interrogation.sql`](4_interrogation.sql) est précédée d'un commentaire qui indique la donnée recherchée. On a écrit 28 requêtes :
+
+| Type | Requêtes |
+|---|---|
+| Projections et sélections (tri, `DISTINCT`, `LIKE`, `IN`, `BETWEEN`) | 1.1 à 1.7 |
+| Agrégations (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `GROUP BY`, `HAVING`) | 2.1 à 2.6 |
+| Jointures (interne, externe gauche, auto-jointure, multiples) | 3.1 à 3.7 |
+| Requêtes imbriquées (`NOT EXISTS`, `IN`, `ALL`, `ANY`, `NOT IN`, `EXISTS`) | 4.1 à 4.7 |
+| Requête étudiée ci-dessous (plans d'exécution) | 5 |
+
+---
+
+### Étude des plans d'exécution
+
+**Requête étudiée :** les titres des films regardés sur smartphone (requête 5 du fichier).
+
+```sql
+SELECT DISTINCT ct.titre
+FROM Visionnage v
+JOIN Contenu ct ON ct.id_contenu = v.id_contenu
+WHERE ct.type_contenu = 'film'
+  AND v.type_appareil = 'smartphone';
+```
+
+Elle utilise **3 opérateurs** de l'algèbre relationnelle :
+
+- la **sélection** σ ;
+- la **jointure** ⋈ ;
+- la **projection** π.
+
+En algèbre relationnelle :
+
+π<sub>titre</sub> ( σ<sub>type_contenu='film' ∧ type_appareil='smartphone'</sub> ( Visionnage ⋈<sub>id_contenu</sub> Contenu ) )
+
+**Cardinalités mesurées sur notre base :**
+
+| Ensemble | Lignes |
+|---|---|
+| Visionnage | 320 |
+| Contenu | 40 |
+| σ<sub>type_appareil='smartphone'</sub>(Visionnage) | 77 |
+| σ<sub>type_contenu='film'</sub>(Contenu) | 28 |
+| Visionnage ⋈ Contenu | 320 (chaque visionnage concerne un seul contenu) |
+| après la sélection film ∧ smartphone | 57 |
+| après la projection sur titre (sans doublon) | 19 |
+
+**Modèle de coût :**
+
+- une sélection ou une projection sur *n* lignes coûte *n* instructions, car chaque ligne est lue une fois ;
+- une jointure par boucles imbriquées entre *n₁* et *n₂* lignes coûte *n₁ × n₂* instructions, car chaque couple de lignes est comparé.
+
+#### Plan 1 : jointure d'abord, sélection ensuite (plan naïf)
+
+```mermaid
+graph BT
+    V["Visionnage<br/>320 lignes"] --> J["⋈ id_contenu<br/>320 lignes"]
+    C["Contenu<br/>40 lignes"] --> J
+    J --> S["σ type_contenu='film' ∧ type_appareil='smartphone'<br/>57 lignes"]
+    S --> P["π titre<br/>19 lignes"]
+```
+
+| Étape | Calcul | Instructions |
+|---|---|---|
+| Visionnage ⋈ Contenu | 320 × 40 | 12 800 |
+| σ film ∧ smartphone | 320 | 320 |
+| π titre | 57 | 57 |
+| **Total** | | **13 177** |
+
+#### Plan 2 : sélections descendues avant la jointure
+
+```mermaid
+graph BT
+    V["Visionnage<br/>320 lignes"] --> SV["σ type_appareil='smartphone'<br/>77 lignes"]
+    C["Contenu<br/>40 lignes"] --> SC["σ type_contenu='film'<br/>28 lignes"]
+    SV --> J["⋈ id_contenu<br/>57 lignes"]
+    SC --> J
+    J --> P["π titre<br/>19 lignes"]
+```
+
+| Étape | Calcul | Instructions |
+|---|---|---|
+| σ smartphone (Visionnage) | 320 | 320 |
+| σ film (Contenu) | 40 | 40 |
+| ⋈ | 77 × 28 | 2 156 |
+| π titre | 57 | 57 |
+| **Total** | | **2 573** |
+
+#### Plan 3 : sélections et projections descendues
+
+```mermaid
+graph BT
+    V["Visionnage<br/>320 lignes"] --> SV["σ type_appareil='smartphone'<br/>77 lignes"]
+    SV --> PV["π id_contenu<br/>77 lignes"]
+    C["Contenu<br/>40 lignes"] --> SC["σ type_contenu='film'<br/>28 lignes"]
+    SC --> PC["π id_contenu, titre<br/>28 lignes"]
+    PV --> J["⋈ id_contenu<br/>57 lignes"]
+    PC --> J
+    J --> P["π titre<br/>19 lignes"]
+```
+
+| Étape | Calcul | Instructions |
+|---|---|---|
+| σ smartphone | 320 | 320 |
+| σ film | 40 | 40 |
+| π id_contenu | 77 | 77 |
+| π id_contenu, titre | 28 | 28 |
+| ⋈ | 77 × 28 | 2 156 |
+| π titre | 57 | 57 |
+| **Total** | | **2 678** |
+
+#### Conclusion
+
+| Plan | Instructions |
+|---|---|
+| Plan 1 (jointure d'abord) | 13 177 |
+| **Plan 2 (sélections d'abord)** | **2 573** |
+| Plan 3 (sélections + projections d'abord) | 2 678 |
+
+Le **plan 2 est le plan optimisé**. Il demande environ **5 fois moins d'instructions** que le plan naïf (2 573 contre 13 177).
+
+- **Pourquoi le plan 2 gagne :** la jointure est l'opération la plus coûteuse, puisque son coût est le produit des tailles. En faisant les sélections avant, on joint 77 × 28 lignes au lieu de 320 × 40. C'est la règle d'optimisation : *descendre les sélections le plus bas possible dans l'arbre*.
+- **Pourquoi le plan 3 ne fait pas mieux :** descendre aussi les projections ne réduit pas le nombre de lignes, seulement le nombre de colonnes. Avec notre modèle de coût, cela ajoute 105 instructions de lecture. En pratique, le plan 3 peut quand même être intéressant sur de très grosses tables, parce que les lignes manipulées sont plus légères en mémoire. Mais au sens du nombre d'instructions, le plan 2 reste le meilleur.

@@ -289,24 +289,23 @@ Le prompt est dans [`prompt_insertion.txt`](prompt_insertion.txt) et le résulta
 
 ### Scénario d'utilisation
 
-**Utilisateur :** le ou la **responsable Stratégie contenus & Marketing** de la plateforme.
+**Utilisateur :** l'équipe **contenus et marketing** de la plateforme, qui prépare la campagne de fin d'année.
 
-**Contexte :** l'équipe prépare la **campagne de fin d'année**. La personne interroge la base pour :
+Elle interroge la base pour répondre à plusieurs questions :
 
-1. **Choisir les contenus à mettre en avant :** les nouveautés (films sortis depuis 2022), les contenus les plus regardés, le casting des séries pour les visuels, les contenus « multi-écrans » vus sur téléviseur et sur smartphone.
-2. **Cibler les supports et les langues :** les appareils les plus utilisés et les langues préférées des profils, pour savoir où diffuser la campagne et dans quelles langues la traduire.
-3. **Relancer les abonnés perdus :** les comptes qui ont tout résilié, pour une campagne « Revenez chez nous », les souscriptions suspendues à surveiller, et les profils qui n'ont encore rien regardé.
-4. **Faire monter en gamme :** les comptes familles (4 profils ou plus) et les comptes en formule Standard ou Standard avec publicité qui regardent plus que certains comptes Premium, pour leur proposer le passage en Premium. Elle suit aussi le revenu mensuel par formule.
-5. **Valoriser le catalogue :** les contenus Animation réellement regardés par les profils jeunesse, et les contenus jamais visionnés, à remettre en avant ou à retirer.
+1. **L'utilisation de la plateforme :** sur quels appareils on regarde le plus, quels mois sont les plus actifs, quelles langues sont utilisées par les profils.
+2. **Le catalogue :** les films récents, le contenu le plus regardé, les contenus jamais visionnés, les genres et sous-genres, les acteurs et les personnages qu'ils jouent.
+3. **Les abonnements :** les comptes qui ont tout résilié, les souscriptions suspendues ou résiliées, le revenu par formule, et les comptes Standard qui regardent plus que certains comptes Premium (à qui proposer de passer en Premium).
+4. **Les profils :** les comptes avec beaucoup de profils, les profils qui n'ont rien regardé, ce que regardent les profils jeunesse.
 
-Chaque requête de [`4_interrogation.sql`](4_interrogation.sql) est précédée d'un commentaire qui indique la donnée recherchée. On a écrit 28 requêtes :
+Chaque requête de [`4_interrogation.sql`](4_interrogation.sql) est précédée d'un commentaire qui indique la donnée recherchée. On a écrit 21 requêtes :
 
 | Type | Requêtes |
 |---|---|
-| Projections et sélections (tri, `DISTINCT`, `LIKE`, `IN`, `BETWEEN`) | 1.1 à 1.7 |
-| Agrégations (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `GROUP BY`, `HAVING`) | 2.1 à 2.6 |
-| Jointures (interne, externe gauche, auto-jointure, multiples) | 3.1 à 3.7 |
-| Requêtes imbriquées (`NOT EXISTS`, `IN`, `ALL`, `ANY`, `NOT IN`, `EXISTS`) | 4.1 à 4.7 |
+| Projections et sélections (tri, `DISTINCT`, `LIKE`, `IN`, `BETWEEN`) | 1.1 à 1.5 |
+| Agrégations (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `GROUP BY`, `HAVING`) | 2.1 à 2.5 |
+| Jointures (internes, externes, auto-jointure, multiples) | 3.1 à 3.5 |
+| Requêtes imbriquées (`NOT EXISTS`, `IN`, `ALL`, `ANY`, `NOT IN`) | 4.1 à 4.5 |
 | Requête étudiée ci-dessous (plans d'exécution) | 5 |
 
 ---

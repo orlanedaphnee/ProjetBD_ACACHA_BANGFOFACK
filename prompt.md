@@ -1,4 +1,4 @@
-# Prompt final (version 2) - Netflix
+# Prompt final - Netflix
 
 Prompt construit à partir de la base de prompt fournie (framework RICARDO). Seules les parties `[A COMPLETER]` ont été remplies.
 
